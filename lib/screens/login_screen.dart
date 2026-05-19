@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user.dart';
 import '../services/api_service.dart';
 
 import 'summary_screen.dart';
@@ -77,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => SummaryScreen(userId: user['id'], hoTen: user['hoTen']),
+            builder: (_) => SummaryScreen(userId: user.id, hoTen: user.hoTen),
           ),
         );
       } else {

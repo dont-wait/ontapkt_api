@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/user.dart';
+import '../models/danh_muc.dart';
+import '../models/giao_dich.dart';
 
 /// Service gọi API .NET 8
 class ApiService {
@@ -8,41 +11,43 @@ class ApiService {
   static const String baseUrl = 'http://localhost:5000/api';
 
   // ==================== ĐĂNG NHẬP ====================
-  static Future<Map<String, dynamic>?> login(int id, String matKhau) async {
+  static Future<User?> login(int id, String matKhau) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'id': id, 'matKhau': matKhau}),
     );
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return User.fromJson(jsonDecode(response.body));
     }
     return null;
   }
 
   // ==================== DANH MỤC ====================
-  static Future<List<Map<String, dynamic>>> getDanhMuc(String loai) async {
+  static Future<List<DanhMuc>> getDanhMuc(String loai) async {
     final response = await http.get(Uri.parse('$baseUrl/danhmuc?loai=$loai'));
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => DanhMuc.fromJson(json)).toList();
     }
     return [];
   }
 
   // ==================== GIAO DỊCH ====================
-  static Future<bool> themGiaoDich(Map<String, dynamic> data) async {
+  static Future<bool> themGiaoDich(GiaoDich giaoDich) async {
     final response = await http.post(
       Uri.parse('$baseUrl/giaodich'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
+      body: jsonEncode(giaoDich.toJson()),
     );
     return response.statusCode == 201;
   }
 
-  static Future<List<Map<String, dynamic>>> getGiaoDich(int userId) async {
+  static Future<List<GiaoDich>> getGiaoDich(int userId) async {
     final response = await http.get(Uri.parse('$baseUrl/giaodich?userId=$userId'));
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => GiaoDich.fromJson(json)).toList();
     }
     return [];
   }

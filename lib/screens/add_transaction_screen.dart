@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import '../models/danh_muc.dart';
+import '../models/giao_dich.dart';
 import '../services/api_service.dart';
 import 'summary_screen.dart';
 
@@ -28,7 +30,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   DateTime _ngay = DateTime.now();
   int? _danhMucId;
   String? _hinhBase64;
-  List<Map<String, dynamic>> _danhMucs = [];
+  List<DanhMuc> _danhMucs = [];
   bool _isLoading = false;
 
   @override
@@ -94,18 +96,18 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
     setState(() => _isLoading = true);
 
-    final data = {
-      'ngay': DateFormat('yyyy-MM-dd').format(_ngay),
-      'loai': _loai,
-      'tongTien': soTien,
-      'moTa': _moTaController.text.trim(),
-      'danhMucId': _danhMucId,
-      'hinhMinhHoa': _hinhBase64 ?? '',
-      'userId': widget.userId,
-    };
+    final giaoDich = GiaoDich(
+      ngay: DateFormat('yyyy-MM-dd').format(_ngay),
+      loai: _loai,
+      tongTien: soTien,
+      moTa: _moTaController.text.trim(),
+      danhMucId: _danhMucId!,
+      hinhMinhHoa: _hinhBase64 ?? '',
+      userId: widget.userId,
+    );
 
     try {
-      final ok = await ApiService.themGiaoDich(data);
+      final ok = await ApiService.themGiaoDich(giaoDich);
       if (ok && mounted) {
         // Chuyển sang trang tổng hợp
         Navigator.pushReplacement(
@@ -222,8 +224,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
               items: _danhMucs.map((dm) {
                 return DropdownMenuItem<int>(
-                  value: dm['id'],
-                  child: Text(dm['tenDanhMuc']),
+                  value: dm.id,
+                  child: Text(dm.tenDanhMuc),
                 );
               }).toList(),
               onChanged: (val) => setState(() => _danhMucId = val),
